@@ -1,0 +1,59 @@
+service:
+  name: sls-aws-bill-monitor
+
+plugins:
+  - serverless-plugin-common-excludes
+  - serverless-plugin-tracing
+  - serverless-prune-plugin
+  - serverless-plugin-typescript
+  - serverless-iam-roles-per-function
+  - serverless-offline
+
+custom:
+  awsAccountId: ${ssm:ACCOUNT_ID~true}
+  prune:
+    automatic: true
+    number: 5
+  serverless-offline:
+    port: 3100
+
+provider:
+  name: aws
+  runtime: 'nodejs12.x'
+  stage: ${opt:stage, 'dev'}
+  region: 'eu-west-1'
+  environment:
+    AWS_CHECK_BILL_SNS_TOPIC: ${ssm:/checkBill/snsTopicArn~true}
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - ssm:DescribeParameters
+      Resource:
+        - '*'
+    - Effect: Allow
+      Action:
+        - ssm:GetParameters
+      Resource:
+        - 'arn:aws:ssm:${self:provider.region}:${self:custom.awsAccountId}:parameter/checkBill/snsTopicArn/'
+    - Effect: Allow
+      Action:
+        - KMS:Decrypt
+      Resource: 'arn:aws:kms:aws-region:${self:custom.awsAccountId}:key/alias/aws/ssm'
+
+functions:
+  dailyCheckAwsBills:
+    handler: ./index.handler
+    timeout: 120
+    events:
+      - schedule: cron(0 9 * * ? *)
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+          - sns:Publish
+        Resource:
+          - 'arn:aws:sns:${self:provider.region}:${self:custom.awsAccountId}:AWS-Bill-Runner'
+      - Effect: Allow
+        Action:
+          - ce:*
+        Resource:
+          - '*'
