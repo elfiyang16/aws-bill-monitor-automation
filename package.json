@@ -1,0 +1,46 @@
+{
+  "name": "aws-monitor",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "deploy:sls": "sls deploy --aws-profile $AWS_PROFILE",
+    "deploy:clean": "rm -f serverless.yml && rm -rf .serverless && rm -rf .build",
+    "deploy:slack": "cp slack/serverless.yml . && npm deploy:sls && npm deploy:clean",
+    "lint": "eslint --ext .js,.ts services/",
+    "prettier": "prettier --list-different services/ lib/",
+    "prettier:write": "prettier --write services/ lib/",
+    "check-types": "tsc --noEmit",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "aws-sdk": "^2.538.0"
+  },
+  "devDependencies": {
+    "@types/aws-lambda": "^8.10.76",
+    "@types/node": ">=4.2.0 < 13",
+    "eslint": "^7.16.0",
+    "prettier": "2.2.1",
+    "serverless": "^1.83.0",
+    "serverless-domain-manager": "^5.1.0",
+    "serverless-iam-roles-per-function": "^2.0.2",
+    "serverless-offline": "^5.12.1",
+    "serverless-plugin-common-excludes": "^3.0.0",
+    "serverless-plugin-tracing": "^2.0.0",
+    "serverless-plugin-typescript": "^1.1.9",
+    "serverless-prune-plugin": "^1.4.3",
+    "serverless-step-functions": "^2.10.0",
+    "ts-node": "^10.0.0",
+    "typescript": "^4.3.5"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/elfiyang16/aws-bill-monitor-automation.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/elfiyang16/aws-bill-monitor-automation/issues"
+  },
+  "homepage": "https://github.com/elfiyang16/aws-bill-monitor-automation#readme"
+}
