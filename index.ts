@@ -1,6 +1,6 @@
 import AWS from 'aws-sdk';
 import { getDailyCost } from './check-bill';
-const sns = new AWS.SNS({ apiVersion: '2010-03-31' });
+const sns = new AWS.SNS({ apiVersion: '2010-03-31', region: 'eu-west-1' });
 
 exports.handler = async () => {
   let message;
@@ -19,8 +19,12 @@ exports.handler = async () => {
       blendedCost: group.Metrics!.BlendedCost.Amount,
     })),
   };
-  console.log('RESULT\n', result);
-  message = `Your cost from yesterday is ${JSON.stringify(result)}`;
+
+  message = `Your cost from yesterday is: \n
+  Date: ${JSON.stringify(result.date)}\n
+  TotalCost: ${JSON.stringify(result.totalCost)}\n
+  Groups: \n
+  ${JSON.stringify(result.groups)}\n`;
 
   let params = {
     Subject: 'Daily AWS Cost Update',
