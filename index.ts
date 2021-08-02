@@ -12,7 +12,11 @@ exports.handler = async () => {
 
   const result = {
     date: ResultsByTime[0].TimePeriod?.Start,
-    totalCost: ResultsByTime[0].Total,
+    // totalCost: ResultsByTime[0].Total,
+    totalCost: ResultsByTime[0].Groups?.reduce(
+      (acc, cur) => acc + parseFloat(cur.Metrics!.BlendedCost.Amount ?? '0'),
+      0
+    ),
     groups: ResultsByTime[0].Groups?.map((group) => ({
       serviceName: group.Keys![0],
       stackName: group.Keys![1].split('$')[1],
